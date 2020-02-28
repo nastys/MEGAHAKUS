@@ -1,0 +1,6 @@
+-std=c++17
+-g
+-Wall
+-O2
+-ffunction-sections
+-fno-exceptions

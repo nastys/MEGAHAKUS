@@ -28,7 +28,7 @@ public:
     }
 };
 
-class OverlayTest : public tsl::Overlay<GuiTest> {
+class OverlayTest : public tsl::Overlay {
 public:
                                              // libtesla already initialized fs, hid, pl, pmdmnt, hid:sys, set:sys and the SD card
     virtual void initServices() override {}  // Called at the start to initialize all services necessary for this Overlay

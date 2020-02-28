@@ -1,0 +1,5 @@
+-std=c17
+-g
+-Wall
+-O2
+-ffunction-sections
