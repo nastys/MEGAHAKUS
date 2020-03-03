@@ -13,7 +13,7 @@ Project DIVA Modding 2nd Discord server: https://discord.gg/cvBVGDZ
 - (recommended) An extracted copy of the game's romfs partition (use [Lockpick_RCM](https://github.com/shchmue/Lockpick_RCM), included with [Kosmos](https://github.com/AtlasNX/Kosmos), to dump your keys, then [hactool](https://github.com/SciresM/hactool) to extract the PFS0 AKA NSP and the NCAs it contains)
 
 ## Installation
-1) Install [nx-ovlloader](https://github.com/WerWolv/nx-ovlloader/releases) and [Tesla-Menu](https://github.com/WerWolv/Tesla-Menu) (both are included with [Kosmos](https://github.com/AtlasNX/Kosmos) v15.2+)
+1) Install [nx-ovlloader](https://github.com/WerWolv/nx-ovlloader) and [Tesla-Menu](https://github.com/WerWolv/Tesla-Menu) (both are included with [Kosmos](https://github.com/AtlasNX/Kosmos) v15.2+)
 2) Get ``MEGAHAKUS.ovl`` from Releases (or clone/download the repository and build it yourself) and copy it to ``switch/.overlays/`` (it's a hidden folder)
 
 ## No-NPR black skin workaround
