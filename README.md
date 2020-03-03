@@ -25,5 +25,5 @@ Project DIVA Modding 2nd Discord server: https://discord.gg/cvBVGDZ
 1) Copy ``pv_082.adp``, ``pv_243.adp``, ``pv_268.adp``, and ``pv_988.adp`` from ``romfs:/rom_switch/rom/add_param/`` to ``atmosphere/contents/0100F3100DA46000/romfs/rom_switch/rom/adp_force/``
 2) To fix outlines in PS4 songs, you'll also need ``pv_234.adp``, ``pv_434.adp``, ``pv_610.adp``, and ``pv_629.adp`` in both ``atmosphere/contents/0100F3100DA46000/romfs/rom_switch/rom/adp_force/`` and ``atmosphere/contents/0100F3100DA46000/romfs/rom_switch/rom/add_param/``
 
-Note that if you disable or enable NPR, you need to go back to the PV selector to apply your changes.
+Note that if you disable or enable NPR, you need to go back to the PV selector to apply your changes. The module selector is not affected.
 
