@@ -1,6 +1,7 @@
 -std=c++17
--g
+-O3
 -Wall
--O2
 -ffunction-sections
 -fno-exceptions
+-fpermissive
+-std=gnu++117

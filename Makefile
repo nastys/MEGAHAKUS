@@ -37,13 +37,13 @@ include $(DEVKITPRO)/libnx/switch_rules
 #   of a homebrew executable (.nro). This is intended to be used for sysmodules.
 #   NACP building is skipped as well.
 #---------------------------------------------------------------------------------
-APP_TITLE	:=	Tesla Overlay Template
+APP_TITLE	:=	MEGAHAKUS
 
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	source
+SOURCES		:=	source Atmosphere-libs/libstratosphere/source/dmnt
 DATA		:=	data
-INCLUDES	:=	include libs/libtesla/include
+INCLUDES	:=	include libs/libtesla/include Atmosphere-libs/libstratosphere/source/dmnt
 
 NO_ICON		:=  1
 
@@ -52,12 +52,12 @@ NO_ICON		:=  1
 #---------------------------------------------------------------------------------
 ARCH	:=	-march=armv8-a+crc+crypto -mtune=cortex-a57 -mtp=soft -fPIE
 
-CFLAGS	:=	-g -Wall -O2 -ffunction-sections \
+CFLAGS	:=	-g -Wall -ffunction-sections \
 			$(ARCH) $(DEFINES)
 
 CFLAGS	+=	$(INCLUDE) -D__SWITCH__
 
-CXXFLAGS	:= $(CFLAGS) -fno-exceptions -std=c++17
+CXXFLAGS	:= $(CFLAGS) -fno-exceptions -std=c++17 -fpermissive -O3
 
 ASFLAGS	:=	-g $(ARCH)
 LDFLAGS	=	-specs=$(DEVKITPRO)/libnx/switch.specs -g $(ARCH) -Wl,-Map,$(notdir $*.map)
@@ -69,6 +69,7 @@ LIBS	:= -lnx
 # include and lib
 #---------------------------------------------------------------------------------
 LIBDIRS	:= $(PORTLIBS) $(LIBNX)
+
 
 
 #---------------------------------------------------------------------------------
@@ -178,6 +179,7 @@ else
 .PHONY:	all
 
 DEPENDS	:=	$(OFILES:.o=.d)
+DEPENDS +=	Atmosphere-libs//libstratosphere/release:.o=.d
 
 #---------------------------------------------------------------------------------
 # main targets
