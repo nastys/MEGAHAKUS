@@ -27,3 +27,24 @@ Project DIVA Modding 2nd Discord server: https://discord.gg/cvBVGDZ
 
 Note that if you disable or enable NPR, you need to go back to the PV selector to apply your changes. The module selector is not affected.
 
+## VP
+```
+Left/right joystick left: -1000 VP
+Left/right joystick right: +1000 VP
+-: 0 VP
++: 9999999 VP
+```
+
+## Debug mode
+Currently works in handheld mode only, and button releases are a bit buggy.
+```
+Left/right joystick: move cursor (press to move faster)
+L/R: hold to move faster
+ZL: left click
+ZR: right click
+```
+Input polling interferes with clicks, therefore it must be disabled.
+
+## Enable recording
+A modified control NCA is required.
+

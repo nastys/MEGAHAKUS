@@ -331,3 +331,4 @@ libs/libtesla/resources/ovl_cheats.jpg
 libs/libtesla/resources/ovl_stats.jpg
 source/constants.h
 source/main.cpp
+source/structs.h
