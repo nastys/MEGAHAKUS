@@ -1,7 +1,7 @@
 # MEGAHAKUS
 A Tesla overlay for 初音ミク Project DIVA MEGA39's.
 
-![screenshot](https://raw.githubusercontent.com/nastys/MEGAHAKUS/e71d5242e9dab59c81a97941ffad87924d060021/preview.jpg)
+![screenshot](https://github.com/nastys/MEGAHAKUS/raw/master/preview.jpg)
 __Screenshot ©SEGA/©Crypton Future Media, INC.→www.piapro.net piapro__
 
 Licence: GNU GENERAL PUBLIC LICENSE Version 2
