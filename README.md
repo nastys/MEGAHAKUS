@@ -44,7 +44,9 @@ ZL: left click
 ZR: right click
 ```
 Input polling interferes with clicks, therefore it must be disabled.
+Based on samyuu's research and code.
 
 ## Enable recording
 A modified control NCA is required.
+Based on somewhatlurker's research.
 
