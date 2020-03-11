@@ -12,6 +12,7 @@ static tsl::elm::ToggleListItem *poll_disable;
 static bool cursor_boundaries=true;
 static bool debug_mode_enabled=false;
 static bool dpad_cursor=false;
+static float opacity=1.0f;
 
 bool VPincrease(u64 button)
 {
@@ -226,7 +227,7 @@ public:
     // Called when this Gui gets loaded to create the UI
     // Allocate all your elements on the heap. libtesla will make sure to clean them up when not needed anymore
     virtual tsl::elm::Element* createUI() override {
-        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS 2.1.0", "For MEGA39's 1.0.3");
+        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS 2.2.0", "For MEGA39's 1.0.3");
         auto list = new tsl::elm::List();
         if (initialized&&debugService_isRunning()&&metadata.title_id==0x100F3100DA46000&&bid_match())
         {
@@ -374,11 +375,13 @@ public:
         unsigned int vpnum;
         if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + VP_AMOUNT_OFFSET_MAIN, &vpnum, sizeof(vpnum)))
             vp_itm->setText("VP: "+std::to_string(vpnum));
+
+        tsl::gfx::Renderer::setOpacity(opacity);
     }
 
     // Called once every frame to handle inputs not handled by other UI elements
     virtual bool handleInput(u64 keysDown, u64 keysHeld, touchPosition touchInput, JoystickPosition leftJoyStick, JoystickPosition rightJoyStick) override {
-        if(debug_mode_enabled&&((!dpad_cursor&&(leftJoyStick.dx!=0||leftJoyStick.dy!=0||rightJoyStick.dx!=0||rightJoyStick.dy!=0))||(dpad_cursor&&(keysHeld&KEY_DUP||keysHeld&KEY_DDOWN||keysHeld&KEY_DLEFT||keysHeld&KEY_DRIGHT))||keysHeld&KEY_ZR||keysHeld&KEY_ZL))
+        if(debug_mode_enabled&&((!dpad_cursor&&(leftJoyStick.dx!=0||leftJoyStick.dy!=0||rightJoyStick.dx!=0||rightJoyStick.dy!=0))||(dpad_cursor&&(keysHeld&KEY_DUP||keysHeld&KEY_DDOWN||keysHeld&KEY_DLEFT||keysHeld&KEY_DRIGHT))||keysHeld&KEY_ZR||keysHeld&KEY_ZL||(keysHeld&KEY_L||keysHeld&KEY_R)))
         {
             DivaInputState dis;
             if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + INPUTSTATE_P0_OFFSET, &dis, sizeof(dis)))
@@ -478,10 +481,15 @@ public:
 
                 dmntchtWriteCheatProcessMemory(metadata.main_nso_extents.base + INPUTSTATE_P0_OFFSET, &dis, sizeof(dis));
             }
+            if((keysDown&KEY_L||keysDown&KEY_R)&&(keysHeld&KEY_L&&keysHeld&KEY_R))
+            {
+                if(opacity>0.0f) opacity=0.0f;
+                else opacity=1.0f;
+            }
             return true;
         }
-
-        return false;   // Return true here to signal the inputs have been consumed
+        if(opacity>0.0f) return false;   // Return true here to signal the inputs have been consumed
+        else return true;
     }
 };
 

@@ -1,4 +1,4 @@
-# MEGAHAKUS 2.1.0
+# MEGAHAKUS 2.2.0
 A Tesla overlay for 初音ミク Project DIVA MEGA39's.
 
 ![screenshot](https://github.com/nastys/MEGAHAKUS/raw/master/preview.jpg)
@@ -52,6 +52,7 @@ Currently works in handheld mode only unless ``D-pad cursor`` is enabled, and bu
 ```
 Joystick (default)/D-pad: move cursor
 L/R/Joystick: hold/push to move faster
+L+R: toggle overlay
 ZL: left click
 ZR: right click
 ```
