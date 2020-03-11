@@ -7,18 +7,20 @@
 static DmntCheatProcessMetadata metadata;
 static bool initialized=false;
 static tsl::elm::ListItem *vp_itm;
+static tsl::elm::ListItem *ress_itm;
 static tsl::elm::ToggleListItem *poll_disable;
 static bool cursor_boundaries=true;
 static bool debug_mode_enabled=false;
+static bool dpad_cursor=false;
 
 bool VPincrease(u64 button)
 {
-    if(button==KEY_A||button==KEY_RIGHT||button==KEY_LSTICK_RIGHT||button==KEY_RSTICK_RIGHT||button==KEY_X||button==KEY_LEFT||button==KEY_LSTICK_LEFT||button==KEY_RSTICK_LEFT||button==KEY_MINUS||button==KEY_PLUS)
+    if(button==KEY_A||button==KEY_DRIGHT||button==KEY_LSTICK_RIGHT||button==KEY_RSTICK_RIGHT||button==KEY_X||button==KEY_DLEFT||button==KEY_LSTICK_LEFT||button==KEY_RSTICK_LEFT||button==KEY_MINUS||button==KEY_PLUS)
     {
         unsigned int vpnum;
         if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + VP_AMOUNT_OFFSET_MAIN, &vpnum, sizeof(vpnum)))
         {
-            if(button==KEY_X||button==KEY_LEFT||button==KEY_LSTICK_LEFT||button==KEY_RSTICK_LEFT)
+            if(button==KEY_X||button==KEY_DLEFT||button==KEY_LSTICK_LEFT||button==KEY_RSTICK_LEFT)
             {
                 vpnum-=1000;
                 if(vpnum>9999999) vpnum = 0;
@@ -33,7 +35,39 @@ bool VPincrease(u64 button)
                 if(vpnum>9999999) vpnum = 9999999;
             }
             dmntchtWriteCheatProcessMemory(metadata.main_nso_extents.base + VP_AMOUNT_OFFSET_MAIN, &vpnum, sizeof(vpnum));
-            vp_itm->setText("VP: "+std::to_string(vpnum));
+        }
+        return true;
+    }
+    return false;
+}
+
+bool ress_control(u64 button)
+{
+    if(button==KEY_A||button==KEY_DRIGHT||button==KEY_LSTICK_RIGHT||button==KEY_RSTICK_RIGHT||button==KEY_X||button==KEY_DLEFT||button==KEY_LSTICK_LEFT||button==KEY_RSTICK_LEFT||button==KEY_MINUS||button==KEY_PLUS||button==KEY_L||button==KEY_R)
+    {
+        int step=1;
+        if(button==KEY_L||button==KEY_R) step=10;
+
+        float ress;
+        if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + RES_SCALE_OFFSET, &ress, sizeof(ress)))
+        {
+            int resp=static_cast<int>(ress*1000);
+            if(button==KEY_X||button==KEY_DLEFT||button==KEY_LSTICK_LEFT||button==KEY_RSTICK_LEFT||button==KEY_L)
+            {
+                if(resp-step>=0) resp-=step;
+                else resp=0;
+            }
+            else if(button==KEY_MINUS)
+                resp = 20;
+            else if(button==KEY_PLUS)
+                resp = 1000;
+            else
+            {
+                if(resp+step<=1000) resp+=step;
+                else resp=1000;
+            }
+            ress=static_cast<float>(resp)/1000;
+            dmntchtWriteCheatProcessMemory(metadata.main_nso_extents.base + RES_SCALE_OFFSET, &ress, sizeof(ress));
         }
         return true;
     }
@@ -169,6 +203,12 @@ void cursor_boundaries_toggle(bool state)
     return;
 }
 
+void dpad_cursor_toggle(bool state)
+{
+    dpad_cursor=state;
+    return;
+}
+
 bool bid_match()
 {
     const unsigned char build_id_size=20;
@@ -186,7 +226,7 @@ public:
     // Called when this Gui gets loaded to create the UI
     // Allocate all your elements on the heap. libtesla will make sure to clean them up when not needed anymore
     virtual tsl::elm::Element* createUI() override {
-        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS 2.0.0", "For MEGA39's 1.0.3");
+        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS 2.1.0", "For MEGA39's 1.0.3");
         auto list = new tsl::elm::List();
         if (initialized&&debugService_isRunning()&&metadata.title_id==0x100F3100DA46000&&bid_match())
         {
@@ -208,19 +248,14 @@ public:
             }
 
             // "VP"
-            // Get current amount
-            unsigned int vpnum;
-            if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + VP_AMOUNT_OFFSET_MAIN, &vpnum, sizeof(vpnum)))
-            {
-                // Create item
-                vp_itm = new tsl::elm::ListItem("VP: "+std::to_string(vpnum));
+            vp_itm = new tsl::elm::ListItem("VP");
+            vp_itm->setClickListener(VPincrease);
+            list->addItem(vp_itm);
 
-                // Set listener function
-                vp_itm->setClickListener(VPincrease);
-
-                // Add item
-                list->addItem(vp_itm);
-            }
+            // "Resolution scale"
+            ress_itm = new tsl::elm::ListItem("Resolution");
+            ress_itm->setClickListener(ress_control);
+            list->addItem(ress_itm);
 
             // "Debug mode"
             // Get current state
@@ -288,6 +323,11 @@ public:
             cur_bound_itm->setStateChangedListener(cursor_boundaries_toggle);
             list->addItem(cur_bound_itm);
 
+            // "D-pad cursor"
+            auto *cur_dpad_itm = new tsl::elm::ToggleListItem("D-pad cursor", dpad_cursor);
+            cur_dpad_itm->setStateChangedListener(dpad_cursor_toggle);
+            list->addItem(cur_dpad_itm);
+
             // "Enable recording"
             // Get current state
             unsigned char recbuffer[1];
@@ -314,34 +354,53 @@ public:
     }
 
     // Called once every frame to update values
-    virtual void update() override {
+    virtual void update() override
+    {
+        // "Resolution scale"
+        // Get current value
+        float resbuf;
+        if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + RES_SCALE_OFFSET, &resbuf, sizeof(resbuf)))
+        {
+            int resp=static_cast<int>(resbuf*1000);
+            std::string resstr=std::to_string(resp);
+            resstr.insert(resstr.end()-1, '.');
+            if(resstr.at(0)=='.') resstr.insert(resstr.begin(), '0');
+            std::string itmstr="Resolution: "+resstr+'%';
+            if(resp<20) itmstr.append(" FLICKER");
+            ress_itm->setText(itmstr);
+        }
+        // "VP"
+        // Get current amount
+        unsigned int vpnum;
+        if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + VP_AMOUNT_OFFSET_MAIN, &vpnum, sizeof(vpnum)))
+            vp_itm->setText("VP: "+std::to_string(vpnum));
     }
 
     // Called once every frame to handle inputs not handled by other UI elements
     virtual bool handleInput(u64 keysDown, u64 keysHeld, touchPosition touchInput, JoystickPosition leftJoyStick, JoystickPosition rightJoyStick) override {
-        if(debug_mode_enabled&&(leftJoyStick.dx!=0||leftJoyStick.dy!=0||rightJoyStick.dx!=0||rightJoyStick.dy!=0||keysDown&KEY_ZR||keysDown&KEY_ZL))
+        if(debug_mode_enabled&&((!dpad_cursor&&(leftJoyStick.dx!=0||leftJoyStick.dy!=0||rightJoyStick.dx!=0||rightJoyStick.dy!=0))||(dpad_cursor&&(keysHeld&KEY_DUP||keysHeld&KEY_DDOWN||keysHeld&KEY_DLEFT||keysHeld&KEY_DRIGHT))||keysHeld&KEY_ZR||keysHeld&KEY_ZL))
         {
             DivaInputState dis;
             if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + INPUTSTATE_P0_OFFSET, &dis, sizeof(dis)))
             {
                 if(keysHeld&KEY_L||keysHeld&KEY_R||keysHeld&KEY_LSTICK||keysHeld&KEY_RSTICK)
                 {
-                    if(leftJoyStick.dx>10000||rightJoyStick.dx>10000)
+                    if(leftJoyStick.dx>10000||rightJoyStick.dx>10000||keysHeld&KEY_DRIGHT)
                     {
                         if(!cursor_boundaries||dis.MouseX<1270) dis.MouseX+=10;
                         else dis.MouseX=1279;
                     }
-                    else if(leftJoyStick.dx<-10000||rightJoyStick.dx<-10000)
+                    else if(leftJoyStick.dx<-10000||rightJoyStick.dx<-10000||keysHeld&KEY_DLEFT)
                     {
                         if(!cursor_boundaries||dis.MouseX>10) dis.MouseX-=10;
                         else dis.MouseX=0;
                     }
-                    if(leftJoyStick.dy<-10000||rightJoyStick.dy<-10000)
+                    if(leftJoyStick.dy<-10000||rightJoyStick.dy<-10000||keysHeld&KEY_DDOWN)
                     {
                         if(!cursor_boundaries||dis.MouseY<710) dis.MouseY+=10;
                         else dis.MouseY=719;
                     }
-                    else if(leftJoyStick.dy>10000||rightJoyStick.dy>10000)
+                    else if(leftJoyStick.dy>10000||rightJoyStick.dy>10000||keysHeld&KEY_DUP)
                     {
                         if(!cursor_boundaries||dis.MouseY>10) dis.MouseY-=10;
                         else dis.MouseY=0;
@@ -349,22 +408,22 @@ public:
                 }
                 else
                 {
-                    if(leftJoyStick.dx>10000||rightJoyStick.dx>10000)
+                    if(leftJoyStick.dx>10000||rightJoyStick.dx>10000||keysHeld&KEY_DRIGHT)
                     {
                         if(!cursor_boundaries||dis.MouseX<1278) dis.MouseX+=2;
                         else dis.MouseX=1279;
                     }
-                    else if(leftJoyStick.dx<-10000||rightJoyStick.dx<-10000)
+                    else if(leftJoyStick.dx<-10000||rightJoyStick.dx<-10000||keysHeld&KEY_DLEFT)
                     {
                         if(!cursor_boundaries||dis.MouseX>2) dis.MouseX-=2;
                         else dis.MouseX=0;
                     }
-                    if(leftJoyStick.dy<-10000||rightJoyStick.dy<-10000)
+                    if(leftJoyStick.dy<-10000||rightJoyStick.dy<-10000||keysHeld&KEY_DDOWN)
                     {
                         if(!cursor_boundaries||dis.MouseY<718) dis.MouseY+=2;
                         else dis.MouseY=719;
                     }
-                    else if(leftJoyStick.dy>10000||rightJoyStick.dy>10000)
+                    else if(leftJoyStick.dy>10000||rightJoyStick.dy>10000||keysHeld&KEY_DUP)
                     {
                         if(!cursor_boundaries||dis.MouseY>2) dis.MouseY-=2;
                         else dis.MouseY=0;
@@ -373,7 +432,7 @@ public:
 
                 static bool RlastPressed=false;
                 static bool RlastReleased=false;
-                if(keysDown&KEY_ZR||keysHeld&KEY_ZR) for(int i=0; i<10000; i++)
+                if(keysHeld&KEY_ZR) for(int i=0; i<10000; i++)
                 {
                     dis.SetBit(102, 0, DivaInputState::Type_Released);
                     dis.SetBit(102, 1, DivaInputState::Type_Tapped);
@@ -396,7 +455,7 @@ public:
 
                 static bool LlastPressed=false;
                 static bool LlastReleased=false;
-                if(keysDown&KEY_ZL||keysHeld&KEY_ZL) for(int i=0; i<10000; i++)
+                if(keysHeld&KEY_ZL) for(int i=0; i<10000; i++)
                 {
                     dis.SetBit(100, 0, DivaInputState::Type_Released);
                     dis.SetBit(100, 1, DivaInputState::Type_Tapped);

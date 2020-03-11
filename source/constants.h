@@ -39,7 +39,12 @@ const unsigned char mouse_map_touchscreen=0xE9;
 const unsigned char mouse_map_enabled[]={0x88, 0x00, 0x00, 0x54};
 const unsigned char mouse_map_disabled[]={0x04, 0x00, 0x00, 0x14};*/
 
+// Resolution scale
+// Thanks to SwigS-27 for the offset
+#define RES_SCALE_OFFSET 0xB2D191BC
+
 // Enable recording
+// Using somewhatlurker's method
 #define ENABLE_RECORDING_OFFSET 0x61EBA0
 const unsigned char recording_enabled[]={0x1F, 0x20, 0x03, 0xD5};
 const unsigned char recording_disabled[]={0x41, 0x00, 0x00, 0x36};

@@ -1,4 +1,4 @@
-# MEGAHAKUS
+# MEGAHAKUS 2.1.0
 A Tesla overlay for 初音ミク Project DIVA MEGA39's.
 
 ![screenshot](https://github.com/nastys/MEGAHAKUS/raw/master/preview.jpg)
@@ -29,17 +29,29 @@ Note that if you disable or enable NPR, you need to go back to the PV selector t
 
 ## VP
 ```
-Left/right joystick left: -1000 VP
-Left/right joystick right: +1000 VP
+Left: -1000 VP
+Right: +1000 VP
 -: 0 VP
 +: 9999999 VP
 ```
 
-## Debug mode
-Currently works in handheld mode only, and button releases are a bit buggy.
+# Resolution scale
+**WARNING:** CAN CAUSE FLICKER!
 ```
-Left/right joystick: move cursor (press to move faster)
-L/R: hold to move faster
+Left: -0.1%
+Right: +0.1%
+L: -1.0%
+R: +1.0%
+-: 2%
++: 100%
+```
+Thanks to SwigS-27 for the resolution scale address.
+
+## Debug mode
+Currently works in handheld mode only unless ``D-pad cursor`` is enabled, and button releases are a bit buggy.
+```
+Joystick (default)/D-pad: move cursor
+L/R/Joystick: hold/push to move faster
 ZL: left click
 ZR: right click
 ```
