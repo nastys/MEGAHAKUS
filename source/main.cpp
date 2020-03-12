@@ -3,6 +3,7 @@
 #include <dmntcht.h>
 #include <sstream>
 #include "constants.h"
+#include "mini-tlac.h"
 
 static DmntCheatProcessMetadata metadata;
 static bool initialized=false;
@@ -13,6 +14,12 @@ static bool cursor_boundaries=true;
 static bool debug_mode_enabled=false;
 static bool dpad_cursor=false;
 static float opacity=1.0f;
+
+void force_test_mode(bool state)
+{
+    if(state) MINITLAC_injectGameSubState(metadata.main_nso_extents.base, 4, 29);
+    else MINITLAC_restoreGameSubState(metadata.main_nso_extents.base);
+}
 
 bool VPincrease(u64 button)
 {
@@ -227,9 +234,9 @@ public:
     // Called when this Gui gets loaded to create the UI
     // Allocate all your elements on the heap. libtesla will make sure to clean them up when not needed anymore
     virtual tsl::elm::Element* createUI() override {
-        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS 2.2.0", "For MEGA39's 1.0.3");
+        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS 2.3.0", "For MEGA39's 1.0.3");
         auto list = new tsl::elm::List();
-        if (initialized&&debugService_isRunning()&&metadata.title_id==0x100F3100DA46000&&bid_match())
+        if (initialized&&debugService_isRunning()&&metadata.title_id==GAME_TITLE_ID&&bid_match())
         {
             // "Disable NPR"
             // Get current state
@@ -272,7 +279,6 @@ public:
 
             // Add item
             list->addItem(debug_mode);
-
 
             // "Cursor to touchscreen"
             // Get current state
@@ -329,6 +335,20 @@ public:
             cur_dpad_itm->setStateChangedListener(dpad_cursor_toggle);
             list->addItem(cur_dpad_itm);
 
+            // "Force TEST_MODE"
+            // Get current state
+            unsigned char tmbuffer[1];
+            if(dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + STATE_SWITCH_OFFSET+2, tmbuffer, 1)) tmbuffer[0]=0x00;
+
+            // Create item
+            auto *force_test_mode_itm = new tsl::elm::ToggleListItem("Force TEST_MODE", tmbuffer[0]==0x80);
+
+            // Set listener function
+            force_test_mode_itm->setStateChangedListener(force_test_mode);
+
+            // Add item
+            list->addItem(force_test_mode_itm);
+
             // "Enable recording"
             // Get current state
             unsigned char recbuffer[1];
@@ -357,31 +377,34 @@ public:
     // Called once every frame to update values
     virtual void update() override
     {
-        // "Resolution scale"
-        // Get current value
-        float resbuf;
-        if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + RES_SCALE_OFFSET, &resbuf, sizeof(resbuf)))
+        if (initialized&&debugService_isRunning()&&metadata.title_id==GAME_TITLE_ID&&bid_match())
         {
-            int resp=static_cast<int>(resbuf*1000);
-            std::string resstr=std::to_string(resp);
-            resstr.insert(resstr.end()-1, '.');
-            if(resstr.at(0)=='.') resstr.insert(resstr.begin(), '0');
-            std::string itmstr="Resolution: "+resstr+'%';
-            if(resp<20) itmstr.append(" FLICKER");
-            ress_itm->setText(itmstr);
-        }
-        // "VP"
-        // Get current amount
-        unsigned int vpnum;
-        if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + VP_AMOUNT_OFFSET_MAIN, &vpnum, sizeof(vpnum)))
-            vp_itm->setText("VP: "+std::to_string(vpnum));
+            // "Resolution scale"
+            // Get current value
+            float resbuf;
+            if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + RES_SCALE_OFFSET, &resbuf, sizeof(resbuf)))
+            {
+                int resp=static_cast<int>(resbuf*1000);
+                std::string resstr=std::to_string(resp);
+                resstr.insert(resstr.end()-1, '.');
+                if(resstr.at(0)=='.') resstr.insert(resstr.begin(), '0');
+                std::string itmstr="Resolution: "+resstr+'%';
+                if(resp<20) itmstr.append(" FLICKER");
+                ress_itm->setText(itmstr);
+            }
+            // "VP"
+            // Get current amount
+            unsigned int vpnum;
+            if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + VP_AMOUNT_OFFSET_MAIN, &vpnum, sizeof(vpnum)))
+                vp_itm->setText("VP: "+std::to_string(vpnum));
 
-        tsl::gfx::Renderer::setOpacity(opacity);
+            tsl::gfx::Renderer::setOpacity(opacity);
+        }
     }
 
     // Called once every frame to handle inputs not handled by other UI elements
     virtual bool handleInput(u64 keysDown, u64 keysHeld, touchPosition touchInput, JoystickPosition leftJoyStick, JoystickPosition rightJoyStick) override {
-        if(debug_mode_enabled&&((!dpad_cursor&&(leftJoyStick.dx!=0||leftJoyStick.dy!=0||rightJoyStick.dx!=0||rightJoyStick.dy!=0))||(dpad_cursor&&(keysHeld&KEY_DUP||keysHeld&KEY_DDOWN||keysHeld&KEY_DLEFT||keysHeld&KEY_DRIGHT))||keysHeld&KEY_ZR||keysHeld&KEY_ZL||(keysHeld&KEY_L||keysHeld&KEY_R)))
+        if((initialized&&debugService_isRunning()&&metadata.title_id==GAME_TITLE_ID&&bid_match())&&debug_mode_enabled&&((!dpad_cursor&&(leftJoyStick.dx!=0||leftJoyStick.dy!=0||rightJoyStick.dx!=0||rightJoyStick.dy!=0))||(dpad_cursor&&(keysHeld&KEY_DUP||keysHeld&KEY_DDOWN||keysHeld&KEY_DLEFT||keysHeld&KEY_DRIGHT))||keysHeld&KEY_ZR||keysHeld&KEY_ZL||(keysHeld&KEY_L||keysHeld&KEY_R)))
         {
             DivaInputState dis;
             if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + INPUTSTATE_P0_OFFSET, &dis, sizeof(dis)))

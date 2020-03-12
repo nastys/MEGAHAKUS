@@ -3,6 +3,8 @@
 #include <string>
 #include "structs.h"
 
+#define GAME_TITLE_ID 0x100F3100DA46000
+
 // Disable NPR
 #define ADD_PARAM_OFFSET 0x99BA41
 const std::string add_param_redirect="adp_force";
@@ -48,11 +50,5 @@ const unsigned char mouse_map_disabled[]={0x04, 0x00, 0x00, 0x14};*/
 #define ENABLE_RECORDING_OFFSET 0x61EBA0
 const unsigned char recording_enabled[]={0x1F, 0x20, 0x03, 0xD5};
 const unsigned char recording_disabled[]={0x41, 0x00, 0x00, 0x36};
-
-#define FN_DONOR_OFFSET 0x1CB830
-const unsigned char fn_donor_original[]={0x3F, 0x44, 0x00, 0x71, 0x88, 0x00, 0x00, 0x54};
-#define FN_CHANGE_SUB_MODE_ADDRESS 0x71001E3980
-#define FN_CHANGE_SUB_MODE_OFFSET 0x1E3980
-const unsigned char fn_donor_b_change_sub_mode[]={0x54, 0x60, 0x00, 0x14, 0xC0, 0x03, 0x5F, 0xD6}; // b? bl?
 
 #endif // CONSTANTS_H
