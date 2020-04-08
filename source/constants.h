@@ -51,4 +51,8 @@ const unsigned char mouse_map_disabled[]={0x04, 0x00, 0x00, 0x14};*/
 const unsigned char recording_enabled[]={0x1F, 0x20, 0x03, 0xD5};
 const unsigned char recording_disabled[]={0x41, 0x00, 0x00, 0x36};
 
+// Hide PV watermark
+// Offset found by M&M
+#define PVMARK_OFFSET 0x97981D
+
 #endif // CONSTANTS_H

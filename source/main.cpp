@@ -15,6 +15,15 @@ static bool debug_mode_enabled=false;
 static bool dpad_cursor=false;
 static float opacity=1.0f;
 
+void hidepvmark_toggle(bool state)
+{
+    unsigned char buf;
+    if(state) buf='\0';
+    else buf='p';
+    dmntchtWriteCheatProcessMemory(metadata.main_nso_extents.base + PVMARK_OFFSET, &buf, sizeof(buf));
+    return;
+}
+
 void force_test_mode(bool state)
 {
     if(state) MINITLAC_injectGameSubState(metadata.main_nso_extents.base, 4, 29);
@@ -234,7 +243,7 @@ public:
     // Called when this Gui gets loaded to create the UI
     // Allocate all your elements on the heap. libtesla will make sure to clean them up when not needed anymore
     virtual tsl::elm::Element* createUI() override {
-        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS 2.3.0", "For MEGA39's 1.0.3");
+        auto rootFrame = new tsl::elm::OverlayFrame("MEGAHAKUS", "For MEGA39's 1.0.3");
         auto list = new tsl::elm::List();
         if (initialized&&debugService_isRunning()&&metadata.title_id==GAME_TITLE_ID&&bid_match())
         {
@@ -362,6 +371,21 @@ public:
 
                 // Add item
                 list->addItem(enable_rec_itm);
+            }
+
+            // "Hide PV watermark"
+            // Get current state
+            unsigned char pvmbuffer;
+            if(!dmntchtReadCheatProcessMemory(metadata.main_nso_extents.base + PVMARK_OFFSET, &pvmbuffer, 1))
+            {
+                // Create item
+                auto *pvmark_itm = new tsl::elm::ToggleListItem("Hide PV watermark", pvmbuffer=='\0');
+
+                // Set listener function
+                pvmark_itm->setStateChangedListener(hidepvmark_toggle);
+
+                // Add item
+                list->addItem(pvmark_itm);
             }
         }
         else
