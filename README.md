@@ -18,8 +18,8 @@ Project DIVA Modding 2nd Discord server: https://discord.gg/cvBVGDZ
 2) Get ``MEGAHAKUS.ovl`` from Releases (or clone/download the repository and build it yourself) and copy it to ``switch/.overlays/`` (it's a hidden folder)
 
 ## No-NPR black skin workaround
-1) Copy ``shader/hlsl/cloth_defaults.bnsh`` from the game romfs to ``atmosphere/contents/0100F3100DA46000/romfs/shader/hlsl/`` and rename it to ``glass_eyes.bnsh``
-2) Copy ``shader/hlsl/glass_eye_nonssss.bnsh`` from the game romfs to ``atmosphere/contents/0100F3100DA46000/romfs/shader/hlsl/`` and rename it to ``skin_defaults.bnsh``
+1) Copy ``shader/hlsl/cloth_defaults.bnsh`` from the game romfs to ``atmosphere/contents/0100F3100DA46000/romfs/shader/hlsl/`` and rename it ``skin_defaults.bnsh``
+2) Copy ``shader/hlsl/glass_eye_nonssss.bnsh`` from the game romfs to ``atmosphere/contents/0100F3100DA46000/romfs/shader/hlsl/`` and rename it ``glass_eyes.bnsh``
 
 ## Outlines in NPR-only songs
 1) Copy ``pv_082.adp``, ``pv_243.adp``, ``pv_268.adp``, and ``pv_988.adp`` from ``romfs:/rom_switch/rom/add_param/`` to ``atmosphere/contents/0100F3100DA46000/romfs/rom_switch/rom/adp_force/``
